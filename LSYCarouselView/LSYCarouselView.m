@@ -22,6 +22,7 @@
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
+        self.backgroundColor = UIColor.clearColor;
         _imageView = [[UIImageView alloc] init];
         _imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:_imageView];
@@ -36,6 +37,7 @@
 
 @interface LSYCarouselView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>{
     NSInteger _numberOfItems;
+    NSInteger _currentRow;
 }
 @property (nonatomic, strong) UICollectionView *collectionView;
 @end
@@ -63,7 +65,7 @@
             //startAnimation
             _numberOfItems = 1000000;
             [_collectionView reloadData];
-            [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_numberOfItems/2 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+            [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_numberOfItems/2 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
         }
     }
 }
@@ -71,7 +73,11 @@
 #pragma mark - UIScrollViewDelegate
 
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-//    [_collectionView indexPath]
+    NSInteger currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
+    if (_currentRow != currentRow && [_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
+        [_delegate carouselView:self didShowContentAtIndex:currentRow % _contents.count];
+    }
+    _currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -111,8 +117,8 @@
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSInteger index = indexPath.row % _contents.count;
-    if (_delegate && [_delegate respondsToSelector:@selector(carouselView:didClickImageAtIndex:)]) {
-        [_delegate carouselView:self didClickImageAtIndex:index];
+    if (_delegate && [_delegate respondsToSelector:@selector(carouselView:didClickContentAtIndex:)]) {
+        [_delegate carouselView:self didClickContentAtIndex:index];
     }
 }
 
@@ -129,6 +135,7 @@
         _collectionView.delegate = self;
         _collectionView.pagingEnabled = YES;
         _collectionView.bounces = NO;
+        _collectionView.showsHorizontalScrollIndicator = NO;
         [_collectionView registerClass:LSYCarouselViewCell.class forCellWithReuseIdentifier:@"Cell"];
     }
     return _collectionView;

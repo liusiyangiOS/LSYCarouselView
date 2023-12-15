@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 /** 一般用于埋点 */
-- (void)carouselView:(LSYCarouselView *)view didShowImageAtIndex:(NSInteger)index;
+- (void)carouselView:(LSYCarouselView *)view didShowContentAtIndex:(NSInteger)index;
 
-- (void)carouselView:(LSYCarouselView *)view didClickImageAtIndex:(NSInteger)index;
+- (void)carouselView:(LSYCarouselView *)view didClickContentAtIndex:(NSInteger)index;
 
 - (void)carouselView:(LSYCarouselView *)view setImageView:(UIImageView *)imageV withData:(id)data;
 
