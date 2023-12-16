@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)carouselView:(LSYCarouselView *)view didClickContentAtIndex:(NSInteger)index;
 /** 自行解析data中的image内容返回,可以是UIImage或者imageUrl */
 - (id)carouselView:(LSYCarouselView *)view imageContentWithData:(id)data;
+/** 可以修改imageView的contentMode,圆角啥的 */
+- (void)carouselView:(LSYCarouselView *)view configImageViewIfNeed:(UIImageView *)imageView;
 
 @end
 

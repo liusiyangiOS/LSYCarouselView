@@ -53,4 +53,8 @@
     return [data objectForKey:@"imageUrl"];
 }
 
+-(void)carouselView:(LSYCarouselView *)view configImageViewIfNeed:(UIImageView *)imageView{
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+}
+
 @end

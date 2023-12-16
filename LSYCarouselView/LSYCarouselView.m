@@ -24,7 +24,6 @@
     if (self) {
         self.backgroundColor = UIColor.clearColor;
         _imageView = [[UIImageView alloc] init];
-        _imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:_imageView];
         [_imageView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.edges.equalTo(self);
@@ -80,8 +79,12 @@
             [self startAnimateTimer];
             _currentRow = 0;
             _numberOfItems = 1000000;
+            _currentRow = _numberOfItems / 2 - (_numberOfItems / 2 % _contents.count);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_numberOfItems/2 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+                [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_currentRow inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+                if ([_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
+                    [_delegate carouselView:self didShowContentAtIndex:_currentRow % _contents.count];
+                }
             });
         }
         [_collectionView reloadData];
@@ -107,11 +110,11 @@
     self.timerAnimate = [NSTimer scheduledTimerWithTimeInterval:self.animateInterval repeats:YES block:^(NSTimer * _Nonnull timer) {
         [weakSelf scrollNext];
     }];
-//    [[NSRunLoop currentRunLoop] addTimer:self.timerAnimate forMode:NSRunLoopCommonModes];
 }
 
 - (void)scrollNext{
-    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_currentRow + 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+    NSInteger currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
+    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:currentRow + 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
 }
 
 #pragma mark - notification
@@ -132,7 +135,7 @@
     if (_currentRow != currentRow && [_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
         [_delegate carouselView:self didShowContentAtIndex:currentRow % _contents.count];
     }
-    _currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
+    _currentRow = currentRow;
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -147,6 +150,9 @@
     LSYCarouselViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
     if (cell.data != data) {
         cell.data = data;
+        if ([_delegate respondsToSelector:@selector(carouselView:configImageViewIfNeed:)]) {
+            [_delegate carouselView:self configImageViewIfNeed:cell.imageView];
+        }
         if (![data isKindOfClass:UIImage.class] &&
             ![data isKindOfClass:NSString.class]) {
             if (_delegate && [_delegate respondsToSelector:@selector(carouselView:imageContentWithData:)]) {
