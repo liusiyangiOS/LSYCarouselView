@@ -8,7 +8,6 @@
 #import "ViewController.h"
 #import "LSYCarouselView.h"
 #import <Masonry/Masonry.h>
-#import <SDWebImage/UIImageView+WebCache.h>
 
 @interface ViewController ()<LSYCarouselViewDelegate>
 
@@ -50,9 +49,8 @@
     NSLog(@"点击了第%ld个图像",index);
 }
 
-- (void)carouselView:(LSYCarouselView *)view setImageView:(UIImageView *)imageV withData:(id)data{
-    NSString *imageUrl = [data objectForKey:@"imageUrl"];
-    [imageV sd_setImageWithURL:[NSURL URLWithString:imageUrl]];
+- (id)carouselView:(LSYCarouselView *)view imageContentWithData:(id)data{
+    return [data objectForKey:@"imageUrl"];
 }
 
 @end
