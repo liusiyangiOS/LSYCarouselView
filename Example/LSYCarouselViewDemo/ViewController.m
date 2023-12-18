@@ -22,9 +22,12 @@
     
     LSYCarouselView *carouselView = [[LSYCarouselView alloc] init];
     carouselView.delegate = self;
+    carouselView.animateInterval = 2;
     [self.view addSubview:carouselView];
     [carouselView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.leading.trailing.equalTo(self.view);
+        make.leading.equalTo(self.view);
+        make.trailing.equalTo(self.view);
+//        make.trailing.equalTo(self.view).offset(-0.5);
         make.centerY.equalTo(self.view);
         make.height.equalTo(@200);
     }];

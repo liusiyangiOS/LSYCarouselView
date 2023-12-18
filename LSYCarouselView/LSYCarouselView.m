@@ -85,6 +85,7 @@
             self.pageControl.numberOfPages = _contents.count;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_currentRow inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+                _collectionView.contentOffset = CGPointMake(_collectionView.frame.size.width * _currentRow, 0);
                 if ([_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
                     [_delegate carouselView:self didShowContentAtIndex:_currentRow % _contents.count];
                 }
@@ -116,12 +117,12 @@
 }
 
 - (void)scrollNext{
-    NSInteger currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
-    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:currentRow + 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_currentRow + 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
 }
 
 - (void)updateCurrentRow{
     NSInteger currentRow = _collectionView.contentOffset.x / _collectionView.frame.size.width;
+    NSLog(@"---------%ld",currentRow);
     if (_currentRow != currentRow) {
         _currentRow = currentRow;
         _pageControl.currentPage = currentRow % _contents.count;
