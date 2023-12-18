@@ -17,7 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.view.backgroundColor = UIColor.blackColor;
     UIImage *image = [UIImage imageNamed:@"BannerImage"];
     
     LSYCarouselView *carouselView = [[LSYCarouselView alloc] init];
