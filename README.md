@@ -24,7 +24,7 @@
 
 ## 安装要求
 
-| LSYListViewDataSource 版本 | 最低 iOS Target |        注意       |
+|    LSYCarouselView 版本    | 最低 iOS Target |        注意       |
 | :-----------------------: | :------------: | :--------------: |
 |            1.x            |     iOS 9      | 要求 Xcode 11 以上 |
 
@@ -34,4 +34,4 @@
 
 ## 协议
 
-LSYNetworking 被许可在 MIT 协议下使用。查阅 LICENSE 文件来获得更多信息。
+LSYCarouselView 被许可在 MIT 协议下使用。查阅 LICENSE 文件来获得更多信息。
