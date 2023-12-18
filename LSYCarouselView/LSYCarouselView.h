@@ -26,11 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LSYCarouselView : UIView
 
 /** 轮播的时间间隔,默认5s */
-@property (assign, nonatomic) NSTimeInterval animateInterval;
+@property (nonatomic, assign) NSTimeInterval animateInterval;
 
 @property (nonatomic, strong, readonly) NSArray *contents;
 
-@property (weak, nonatomic) id<LSYCarouselViewDelegate> delegate;
+@property (nonatomic, weak) id<LSYCarouselViewDelegate> delegate;
+
+@property (nonatomic, strong) UIPageControl *pageControl;
 
 /**
  默认会将数组中的元素当成imageUrl或image进行解析

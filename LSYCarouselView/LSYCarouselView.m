@@ -75,11 +75,14 @@
         if (_contents.count <= 1) {
             _currentRow = 0;
             _numberOfItems = _contents.count;
+            [_pageControl removeFromSuperview];
+            _pageControl = nil;
         }else{
             [self startAnimateTimer];
-            _currentRow = 0;
             _numberOfItems = 1000000;
             _currentRow = _numberOfItems / 2 - (_numberOfItems / 2 % _contents.count);
+            self.pageControl.currentPage = 0;
+            self.pageControl.numberOfPages = _contents.count;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:_currentRow inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
                 if ([_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
@@ -117,6 +120,17 @@
     [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:currentRow + 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
 }
 
+- (void)updateCurrentRow{
+    NSInteger currentRow = _collectionView.contentOffset.x / _collectionView.frame.size.width;
+    if (_currentRow != currentRow) {
+        _currentRow = currentRow;
+        _pageControl.currentPage = currentRow % _contents.count;
+        if ([_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
+            [_delegate carouselView:self didShowContentAtIndex:currentRow % _contents.count];
+        }
+    }
+}
+
 #pragma mark - notification
 
 - (void)applicationWillEnterForeground {
@@ -130,12 +144,20 @@
 
 #pragma mark - UIScrollViewDelegate
 
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
+    [self stopAnimation];
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
+    [self startAnimateTimer];
+}
+
+-(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView{
+    [self updateCurrentRow];
+}
+
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-    NSInteger currentRow = [_collectionView indexPathsForVisibleItems].firstObject.row;
-    if (_currentRow != currentRow && [_delegate respondsToSelector:@selector(carouselView:didShowContentAtIndex:)]) {
-        [_delegate carouselView:self didShowContentAtIndex:currentRow % _contents.count];
-    }
-    _currentRow = currentRow;
+    [self updateCurrentRow];
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -202,6 +224,19 @@
         [_collectionView registerClass:LSYCarouselViewCell.class forCellWithReuseIdentifier:@"Cell"];
     }
     return _collectionView;
+}
+
+-(UIPageControl *)pageControl{
+    if (!_pageControl) {
+        _pageControl = [[UIPageControl alloc] init];
+        _pageControl.hidesForSinglePage = YES;
+        [self addSubview:_pageControl];
+        [_pageControl mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self);
+            make.bottom.equalTo(self).offset(-10);
+        }];
+    }
+    return _pageControl;
 }
 
 -(NSTimeInterval)animateInterval{
